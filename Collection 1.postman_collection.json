@@ -1,0 +1,386 @@
+{
+	"info": {
+		"_postman_id": "2bc94db9-5775-4461-af31-a3beb16f8377",
+		"name": "Collection 1",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "50283434",
+		"_collection_link": "https://fatimazahra19992021-1191245.postman.co/workspace/fatimazahra's-Workspace~b3a76db7-06b3-4e1e-81ac-f1ced84fcadb/collection/50283434-2bc94db9-5775-4461-af31-a3beb16f8377?action=share&source=collection_link&creator=50283434"
+	},
+	"item": [
+		{
+			"name": "Get all projects",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const response = pm.response.json();\r",
+							"\r",
+							"let projects = response.map(p => p.name);\r",
+							"\r",
+							"\r",
+							"// On normalise les noms (supprime la casse + espaces spéciaux)\r",
+							"const normalize = s => s.replace(/\\u00A0/g, \" \").toLowerCase();\r",
+							"\r",
+							"// On cherche l’index du projet\r",
+							"const index = projects.findIndex(\r",
+							"    p => normalize(p) === normalize(\"Mon projet Scrum\")\r",
+							");\r",
+							"\r",
+							"// On stocke l’ID du projet\r",
+							"pm.collectionVariables.set(\"projectId\", response[index].id);\r",
+							"pm.collectionVariables.set(\"projectKey\", response[index].key);\r",
+							"\r",
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "{{Password}}",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "{{Username}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{Hostname}}/rest/api/3/project",
+					"host": [
+						"{{Hostname}}"
+					],
+					"path": [
+						"rest",
+						"api",
+						"3",
+						"project"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get issuetypes",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const response = pm.response.json();\r",
+							"console.log(response);\r",
+							"let issuetypes = response.map(issue => issue.name);\r",
+							"pm.collectionVariables.set(\"issueId\", response[issuetypes.indexOf(pm.variables.get(\"Issue Name\"))].id);\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "{{Password}}",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "{{Username}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{Hostname}}/rest/api/3/issuetype/project?projectId={{projectId}}",
+					"host": [
+						"{{Hostname}}"
+					],
+					"path": [
+						"rest",
+						"api",
+						"3",
+						"issuetype",
+						"project"
+					],
+					"query": [
+						{
+							"key": "projectId",
+							"value": "{{projectId}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get users",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const response = pm.response.json();\r",
+							"console.log(response);\r",
+							"let users = response.map((user)=> user.displayName);\r",
+							"pm.collectionVariables.set(\"userId\", response[users.indexOf(\"fatimazahra\")].accountId);\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "{{Password}}",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "{{Username}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{Hostname}}/rest/api/3/user/assignable/multiProjectSearch?query=\"fatimazahra\"&projectKeys={{projectKey}}",
+					"host": [
+						"{{Hostname}}"
+					],
+					"path": [
+						"rest",
+						"api",
+						"3",
+						"user",
+						"assignable",
+						"multiProjectSearch"
+					],
+					"query": [
+						{
+							"key": "query",
+							"value": "\"fatimazahra\""
+						},
+						{
+							"key": "projectKeys",
+							"value": "{{projectKey}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create issue",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const response = pm.response.json();\r",
+							"pm.collectionVariables.set(\"newissueId\", response.id);"
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"pm.collectionVariables.set(\"Issue Title\", pm.variables.get(\"Issue Title\"));"
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "{{Password}}",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "{{Username}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{ \"fields\": {\r\n   \r\n    \"issuetype\": {\r\n      \"id\": \"{{issueId}}\"\r\n    },\r\n    \"project\": {\r\n      \"id\": \"{{projectId}}\"\r\n    },\r\n    \"reporter\": {\r\n      \"id\": \"{{userId}}\"\r\n    },\r\n    \"summary\": \"{{Issue Title}}\"\r\n  },\r\n  \"update\": {}\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{Hostname}}/rest/api/3/issue",
+					"host": [
+						"{{Hostname}}"
+					],
+					"path": [
+						"rest",
+						"api",
+						"3",
+						"issue"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get issue",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const response = pm.response.json();\r",
+							"\r",
+							"pm.test(\"Status code \", function () {\r",
+							"    pm.expect(response.fields.assignee.accountId).to.eql(pm.collectionVariables.get(\"userId\"));\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "{{Password}}",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "{{Username}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{Hostname}}/rest/api/3/issue/{{newissueId}}",
+					"host": [
+						"{{Hostname}}"
+					],
+					"path": [
+						"rest",
+						"api",
+						"3",
+						"issue",
+						"{{newissueId}}"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"requests": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"requests": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "Hostname",
+			"value": "https://fatimazahra19992021-1763410774995.atlassian.net"
+		},
+		{
+			"key": "projectId",
+			"value": "10000"
+		},
+		{
+			"key": "projectKey",
+			"value": "SCRUM"
+		},
+		{
+			"key": "userId",
+			"value": "712020:4ab43d70-9c75-4813-b102-1c099ceaafe6"
+		},
+		{
+			"key": "newissueId",
+			"value": "10419"
+		},
+		{
+			"key": "Issue Title",
+			"value": "Json C"
+		},
+		{
+			"key": "Issue Name",
+			"value": "Story"
+		},
+		{
+			"key": "issueId",
+			"value": "10005"
+		}
+	]
+}
